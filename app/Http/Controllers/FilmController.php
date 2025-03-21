@@ -131,28 +131,36 @@ class FilmController extends Controller
     // $films = FilmController::readFilms();
     // return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
 
-        $films = self::readFilms();
+    $films = self::readFilms();
 
-        if ($this->isFilm($films, $request->name)) {
-            return redirect('/')->with('error', 'Esta película ya está registrada.');
-        }
-    
-        $newFilm = [
-            'name' => $request->name,
-            'year' => $request->year,
-            'genre' => $request->genre,
-            'country' => $request->country,
-            'duration' => $request->duration,
-            'img_url' => $request->img_url,
-        ];
-    
+    if ($this->isFilm($films, $request->name)) {
+        return redirect('/')->with('error', 'Esta película ya está registrada.');
+    }
+
+    $newFilm = [
+        'name' => $request->name,
+        'year' => $request->year,
+        'genre' => $request->genre,
+        'country' => $request->country,
+        'duration' => $request->duration,
+        'img_url' => $request->img_url,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ];
+
+    $flag = env('flag', 'default');
+    if ($flag == 'database') {
+        
         Film::create($newFilm);
-    
-        $filmsFromJson = Storage::json('/public/films.json');
+    } elseif ($flag == 'json') {
+        $filmsFromJson = Storage::exists('public/films.json') ? json_decode(Storage::get('public/films.json'), true) : [];
         array_push($filmsFromJson, $newFilm);
-        Storage::put('/public/films.json', json_encode($filmsFromJson));
-    
-        return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
+        Storage::put('public/films.json', json_encode($filmsFromJson, JSON_PRETTY_PRINT));
+    } else {
+        return redirect('/')->with('error', 'Configuración de almacenamiento inválida.');
+    }
+
+    return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
     
 }
 public function listFilms($year = null, $genre = null)
