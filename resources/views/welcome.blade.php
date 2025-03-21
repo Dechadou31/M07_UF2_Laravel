@@ -11,6 +11,12 @@
             <li class="list-group-item"><a href="{{ route('listFilms') }}">📺 Todas las Pelis</a></li>
             <li class="list-group-item"><a href="{{ route('countFilms') }}">📌 Contador de Pelis</a></li>
         </ul>
+             <!-- Enlace a la lista de actores -->
+             <h2 class="my-4 fw-bold text-primary">Lista de Actores</h2>
+        <ul class="list-group">
+            <li class="list-group-item"><a href="{{ route('actors') }}">🎬 Ver todos los actores</a></li>
+            <li class="list-group-item"><a href="{{ route('actors.count') }}">🔢 Contador de Actores</a></li>
+        </ul>
     </div>
 
     @if(session('error'))

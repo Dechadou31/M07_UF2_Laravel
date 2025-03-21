@@ -3,12 +3,21 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Film;
 
 class FilmController extends Controller
 {
     public static function readFilms(): array {
-        $films = Storage::json('/public/films.json');
-        return $films;
+
+    $filmsFromDB = Film::select('name', 'year', 'genre', 'country', 'duration', 'img_url')->get()->toArray();
+
+    $filmsFromJson = [];
+    if (Storage::exists('public/films.json')) {
+        $json = Storage::get('public/films.json');
+        $filmsFromJson = json_decode($json, true) ?? [];
+    }
+
+    return array_merge($filmsFromDB, $filmsFromJson);
     }
 
     public function listOldFilms($year = null)
@@ -93,34 +102,58 @@ class FilmController extends Controller
 
     public function createFilm(Request $request)
 {
-            // Leer películas actuales
-            $films = self::readFilms();
+    //         // Leer películas actuales
+    //         $films = self::readFilms();
 
-            // Verificar si el nombre ya existe
-            if ($this->isFilm($films, $request->name)) {
-                return redirect('/')
-                    ->with('error', 'Esta película ya está registrada.');
-            }
-    // Agrega la nueva película
-    $newFilm = [
-        'name' => $request->name,
-        'year' => $request->year,
-        'genre' => $request->genre,
-        'country' => $request->country,
-        'duration' => $request->duration,
-        'img_url' => $request->img_url,
-    ];
+    //         // Verificar si el nombre ya existe
+    //         if ($this->isFilm($films, $request->name)) {
+    //             return redirect('/')
+    //                 ->with('error', 'Esta película ya está registrada.');
+    //         }
+    // // Agrega la nueva película
+    // $newFilm = [
+    //     'name' => $request->name,
+    //     'year' => $request->year,
+    //     'genre' => $request->genre,
+    //     'country' => $request->country,
+    //     'duration' => $request->duration,
+    //     'img_url' => $request->img_url,
+    // ];
     
-    // Guarda la lista actualizada de películas
-    $films = Storage::json('/public/films.json');
-    if(FilmController::isFilm($films, $newFilm['name'])){
-        return view('welcome' , ["error" => "Ya existe esta peli"]);
-    }
-    array_push($films, $newFilm);
-    Storage::put('/public/films.json', json_encode($films));
+    // // Guarda la lista actualizada de películas
+    // $films = Storage::json('/public/films.json');
+    // if(FilmController::isFilm($films, $newFilm['name'])){
+    //     return view('welcome' , ["error" => "Ya existe esta peli"]);
+    // }
+    // array_push($films, $newFilm);
+    // Storage::put('/public/films.json', json_encode($films));
     
-    $films = FilmController::readFilms();
-    return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
+    // $films = FilmController::readFilms();
+    // return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
+
+        $films = self::readFilms();
+
+        if ($this->isFilm($films, $request->name)) {
+            return redirect('/')->with('error', 'Esta película ya está registrada.');
+        }
+    
+        $newFilm = [
+            'name' => $request->name,
+            'year' => $request->year,
+            'genre' => $request->genre,
+            'country' => $request->country,
+            'duration' => $request->duration,
+            'img_url' => $request->img_url,
+        ];
+    
+        Film::create($newFilm);
+    
+        $filmsFromJson = Storage::json('/public/films.json');
+        array_push($filmsFromJson, $newFilm);
+        Storage::put('/public/films.json', json_encode($filmsFromJson));
+    
+        return redirect('/filmout/films')->with('success', 'Película registrada con éxito.');
+    
 }
 public function listFilms($year = null, $genre = null)
     {
