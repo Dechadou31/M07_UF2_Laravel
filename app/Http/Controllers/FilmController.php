@@ -11,13 +11,13 @@ class FilmController extends Controller
 
     $filmsFromDB = Film::select('name', 'year', 'genre', 'country', 'duration', 'img_url')->get()->toArray();
 
-    $filmsFromJson = [];
-    if (Storage::exists('public/films.json')) {
-        $json = Storage::get('public/films.json');
-        $filmsFromJson = json_decode($json, true) ?? [];
-    }
+    // $filmsFromJson = [];
+    // if (Storage::exists('public/films.json')) {
+    //     $json = Storage::get('public/films.json');
+    //     $filmsFromJson = json_decode($json, true) ?? [];
+    // }
 
-    return array_merge($filmsFromDB, $filmsFromJson);
+    return array_merge($filmsFromDB);
     }
 
     public function listOldFilms($year = null)
@@ -150,7 +150,6 @@ class FilmController extends Controller
 
     $flag = env('flag', 'default');
     if ($flag == 'database') {
-        
         Film::create($newFilm);
     } elseif ($flag == 'json') {
         $filmsFromJson = Storage::exists('public/films.json') ? json_decode(Storage::get('public/films.json'), true) : [];
@@ -170,11 +169,9 @@ public function listFilms($year = null, $genre = null)
         $title = "Listado de todas las pelis";
         $films = FilmController::readFilms();
  
-        //if year and genre are null
         if (is_null($year) && is_null($genre))
             return view('films.list', ["films" => $films, "title" => $title]);
  
-        //list based on year or genre informed
         foreach ($films as $film) {
             if ((!is_null($year) && is_null($genre)) && $film['year'] == $year){
                 $title = "Listado de todas las pelis filtrado x año";
