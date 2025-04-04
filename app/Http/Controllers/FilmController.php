@@ -193,4 +193,9 @@ public function listFilms($year = null, $genre = null)
             }
         }
     }
+    public function getFilmsWithActors()
+    {
+        $films = Film::with('actors')->get();
+        return response()->json($films);
+    }
 }
