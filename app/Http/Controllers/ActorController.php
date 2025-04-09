@@ -61,4 +61,9 @@ public function destroy($id)
         'status' => $deleted
     ]);
 }
+public function apiActorsWithFilms()
+{
+    $actors = Actor::with('films')->get();
+    return response()->json($actors);
+}
 }
