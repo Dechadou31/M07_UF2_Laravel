@@ -79,5 +79,23 @@ public function getActorWithFilms($id)
 
     return response()->json($actor);
 }
+public function createActor(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'surname' => 'nullable|string|max:255',
+        'birthdate' => 'required|date',
+        'country' => 'nullable|string|max:255',
+        'img_url' => 'nullable|url'
+    ]);
+
+    $actor = Actor::create($validated);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Actor creado correctamente',
+        'data' => $actor
+    ], 201);
+}
 
 }
