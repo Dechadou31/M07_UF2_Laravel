@@ -275,5 +275,16 @@ public function updateFilm(Request $request, $id)
         'film' => $film
     ]);
 }
+public function deleteFilm($id)
+{
+    $film = Film::find($id);
 
+    if (!$film) {
+        return response()->json(['error' => 'Película no encontrada.'], 404);
+    }
+
+    $film->delete();
+
+    return response()->json(['message' => 'Película eliminada correctamente.']);
+}
 }
