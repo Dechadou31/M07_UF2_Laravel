@@ -97,5 +97,32 @@ public function createActor(Request $request)
         'data' => $actor
     ], 201);
 }
+public function updateActor(Request $request, $id)
+{
+    $actor = Actor::find($id);
+
+    if (!$actor) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Actor no encontrado'
+        ], 404);
+    }
+
+    $validated = $request->validate([
+        'name' => 'sometimes|required|string|max:255',
+        'surname' => 'nullable|string|max:255',
+        'birthdate' => 'sometimes|required|date',
+        'country' => 'nullable|string|max:255',
+        'img_url' => 'nullable|url'
+    ]);
+
+    $actor->update($validated);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Actor actualizado correctamente',
+        'data' => $actor
+    ]);
+}
 
 }
