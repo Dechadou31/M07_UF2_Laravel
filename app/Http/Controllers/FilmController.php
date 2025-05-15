@@ -198,4 +198,14 @@ public function listFilms($year = null, $genre = null)
         $films = Film::with('actors')->get();
         return response()->json($films);
     }
+
+    public function singleFilm($id)
+    {
+        $films = Film::with('actors')->find($id);
+        return response()->json($films);
+
+    }
+    
+
+
 }
