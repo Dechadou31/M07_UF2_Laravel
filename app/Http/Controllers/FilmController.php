@@ -205,7 +205,50 @@ public function listFilms($year = null, $genre = null)
         return response()->json($films);
 
     }
-    
+    public function createFilm2(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'year' => 'required|integer|min:1800|max:' . date('Y'),
+        'genre' => 'required|string|max:100',
+        'country' => 'required|string|max:100',
+        'duration' => 'required|integer|min:1',
+        'img_url' => 'nullable|url'
+    ]);
 
+    if (env('flag') === 'json') {
+        $films = self::readFilms();
+        if ($this->isFilm($films, $validated['name'])) {
+            return response()->json(['error' => 'La película ya está registrada.'], 409);
+        }
+    }
 
+    $filmData = array_merge($validated, [
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $flag = env('flag', 'database');
+
+    if ($flag === 'database') {
+        $film = Film::create($filmData);
+    } elseif ($flag === 'json') {
+        $filmsFromJson = Storage::exists('public/films.json')
+            ? json_decode(Storage::get('public/films.json'), true)
+            : [];
+
+        $filmData['id'] = count($filmsFromJson) + 1;
+        $filmsFromJson[] = $filmData;
+
+        Storage::put('public/films.json', json_encode($filmsFromJson, JSON_PRETTY_PRINT));
+        $film = $filmData;
+    } else {
+        return response()->json(['error' => 'Configuración de almacenamiento inválida.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Película creada exitosamente.',
+        'film' => $film
+    ], 201);
+}
 }
