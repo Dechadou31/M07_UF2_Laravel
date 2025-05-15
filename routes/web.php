@@ -43,7 +43,7 @@ Route::middleware('year')->group(function() {
     Route::get('/listActorsByDecade/{year?}', [ActorController::class, 'listActorsByDecade'])
     ->name('actors.listByDecade');
     Route::get('/countActors', [ActorController::class, 'countActors'])->name('actors.count');
-    Route::delete('/actors/{id}', [ActorController::class, 'destroy']);
+    
 });
     
 
