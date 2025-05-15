@@ -251,4 +251,29 @@ public function listFilms($year = null, $genre = null)
         'film' => $film
     ], 201);
 }
+public function updateFilm(Request $request, $id)
+{
+    $validated = $request->validate([
+        'name' => 'sometimes|required|string|max:255',
+        'year' => 'sometimes|required|integer|min:1800|max:' . date('Y'),
+        'genre' => 'sometimes|required|string|max:100',
+        'country' => 'sometimes|required|string|max:100',
+        'duration' => 'sometimes|required|integer|min:1',
+        'img_url' => 'sometimes|nullable|url'
+    ]);
+
+    $film = Film::find($id);
+
+    if (!$film) {
+        return response()->json(['error' => 'Película no encontrada.'], 404);
+    }
+
+    $film->update($validated);
+
+    return response()->json([
+        'message' => 'Película actualizada correctamente.',
+        'film' => $film
+    ]);
+}
+
 }
