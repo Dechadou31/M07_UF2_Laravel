@@ -66,4 +66,18 @@ public function apiActorsWithFilms()
     $actors = Actor::with('films')->get();
     return response()->json($actors);
 }
+public function getActorWithFilms($id)
+{
+    $actor = Actor::with('films')->find($id);
+
+    if (!$actor) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Actor no encontrado'
+        ], 404);
+    }
+
+    return response()->json($actor);
+}
+
 }

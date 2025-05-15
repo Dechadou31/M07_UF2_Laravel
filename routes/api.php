@@ -29,5 +29,6 @@ Route::get('films/{id}', [FilmController::class, 'singleFilm']);
 Route::post('/films', [FilmController::class, 'createFilm2']);
 Route::put('/films/{id}', [FilmController::class, 'updateFilm']);
 Route::delete('/films/{id}', [FilmController::class, 'deleteFilm']);
+Route::get('/actors/{id}', [ActorController::class, 'getActorWithFilms']);
 
 
